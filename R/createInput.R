@@ -1,85 +1,44 @@
-# The following declarations are already defined in mode.WIP.cpp
-# they are replicated here to make it compatible with epicR as a pakcage. Amin
-
-record_mode<-c(
-  record_mode_none=0,
-  record_mode_agent=1,
-  record_mode_event=2,
-  record_mode_some_event=3
-)
-
-
-medication_classes<-c(
-  MED_CLASS_SABA=1,
-  MED_CLASS_LABA=2,
-  MED_CLASS_LAMA=4,
-  MED_CLASS_ICS=8,
-  MED_CLASS_MACRO=16
-)
-
-
-
-events<-c(
-  event_start=0,
-  event_fixed=1,
-  event_birthday=2,
-  event_smoking_change=3,
-  event_COPD=4,
-  event_exacerbation=5,
-  event_exacerbation_end=6,
-  event_exacerbation_death=7,
-  event_doctor_visit=8,
-  event_medication_change=9,
-
-  event_mi=10,
-  event_stroke=11,
-  event_hf=12,
-
-  event_bgd=13,
-  event_end=14
-)
-
-
-agent_creation_mode<-c(
-  agent_creation_mode_one=0,
-  agent_creation_mode_all=1,
-  agent_creation_mode_pre=2
-)
-
-
-
-errors<-c(
-  ERR_INCORRECT_SETTING_VARIABLE=-1,
-  ERR_INCORRECT_VECTOR_SIZE=-2,
-  ERR_INCORRECT_INPUT_VAR=-3,
-  ERR_EVENT_STACK_FULL=-4,
-  ERR_MEMORY_ALLOCATION_FAILED=-5
-)
-
-# End of declarations
-
-
-#' Returns a list of default model input values
+#' @title Create Input
+#' @description Allows users to customize input parameters
+#' @param percentFemale decimal: between 0 and 1, percentage of population that is female
+#' @param timeHorizon integer: time in years for model
+#' @param costDiscount decimal: between 0 and 1, percentage which payoffs decrease every year
+#' @param qalyDiscount decimal: between 0 and 1, percentage which QALYs decrease every year
+#' @param baselineAge integer: mean age at baseline
 #' @export
-init_input <- function() {
+createInput <- function(percentFemale = 0.5,
+                        timeHorizon = 20,
+                        costDiscount = 0.03,
+                        qalyDiscount = 0.03,
+                        baselineAge = 40) {
   input <- list()
   input_help <- list()
   input_ref <- list()
 
+  input$global_parameters <- list(age0 = baselineAge,
+                                  time_horizon = timeHorizon,
+                                  discount_cost = costDiscount,
+                                  discount_qaly = qalyDiscount)
 
-  input$global_parameters <- list(age0 = 40, time_horizon = 20, discount_cost = 0.03, discount_qaly = 0.03)
-  input_help$global_parameters <- list(age0 = "Starting age in the model", time_horizon = "Model time horizon", discount_cost = "Discount value for cost outcomes",
+  input_help$global_parameters <- list(age0 = "Starting age in the model",
+                                       time_horizon = "Model time horizon",
+                                       discount_cost = "Discount value for cost outcomes",
                                        discount_qaly = "Discount value for QALY outcomes")
 
 
 
   input_help$agent$p_female <- "Proportion of females in the population"
-  input$agent$p_female <- 0.5
+  input$agent$p_female <- percentFemale
   input_ref$agent$p_female <- "Model assumption"
 
 
-  input_help$agent$height_0_betas <- "Regressoin coefficients for estimating height (in meters) at baseline"
-  input$agent$height_0_betas <- t(as.matrix(c(intercept = 1.82657, sex = -0.13093, age = -0.00125, age2 = 2.31e-06, sex_age = -0.0001651)))
+  input_help$agent$height_0_betas <- "Regression coefficients for estimating height
+  (in meters) at baseline"
+  input$agent$height_0_betas <- t(as.matrix(c(intercept = 1.82657,
+                                              sex = -0.13093,
+                                              age = -0.00125,
+                                              age2 = 2.31e-06,
+                                              sex_age = -0.0001651)))
   input_ref$agent$height_0_betas <- ""
 
 
@@ -88,8 +47,15 @@ init_input <- function() {
   input_ref$agent$height_0_sd <- ""
 
 
-  input_help$agent$weight_0_betas <- "Regressoin coefficients for estimating weiight (in Kg) at baseline"
-  input$agent$weight_0_betas <- t(as.matrix(c(intercept = 50, sex = -5, age = 0.1, age2 = 0, sex_age = 0, height = 1, year = 0.01)))
+  input_help$agent$weight_0_betas <- "Regressoin coefficients for estimating
+  weight (in kg) at baseline"
+  input$agent$weight_0_betas <- t(as.matrix(c(intercept = 50,
+                                              sex = -5,
+                                              age = 0.1,
+                                              age2 = 0,
+                                              sex_age = 0,
+                                              height = 1,
+                                              year = 0.01)))
   input_ref$agent$weight_0_betas <- ""
 
 
@@ -98,14 +64,20 @@ init_input <- function() {
   input_ref$agent$weight_0_sd <- ""
 
 
-  input_help$agent$height_weight_rho <- "Correlaiton coefficient between weight and height at baseline"
+  input_help$agent$height_weight_rho <- "Correlation coefficient between weight and height at baseline"
   input$agent$height_weight_rho <- 0
   input_ref$agent$height_weight_rho <- ""
 
-  input$agent$p_prevalence_age <- c(rep(0, 40), c(473.9, 462.7, 463, 469.3, 489.9, 486.3, 482.7, 479, 483.7, 509, 542.8, 557.7,
-                                                  561.4, 549.7, 555.3, 544.6, 531.6, 523.9, 510.2, 494.1, 486.5, 465.6, 442.8, 424.6, 414.9, 404.3, 394.4, 391.5, 387.3, 330.9,
-                                                  304.5, 292.2, 277.4, 255.1, 241.1, 223.2, 211.4, 198.8, 185.6, 178, 166.7, 155.2, 149.1, 140.6, 131.9, 119.7, 105.8, 95.4,
-                                                  83.4, 73.2, 62.4, 52.3, 42.7, 34.7, 27, 19.9, 13.2, 8.8, 5.9, 3.8, 6.8), rep(0, 10))
+  input$agent$p_prevalence_age <- c(rep(0, 40),
+                                    c(473.9, 462.7, 463, 469.3, 489.9, 486.3, 482.7, 479,
+                                      483.7, 509, 542.8, 557.7, 561.4, 549.7, 555.3, 544.6,
+                                      531.6, 523.9, 510.2, 494.1, 486.5, 465.6, 442.8, 424.6,
+                                      414.9, 404.3, 394.4, 391.5, 387.3, 330.9, 304.5, 292.2,
+                                      277.4, 255.1, 241.1, 223.2, 211.4, 198.8, 185.6, 178,
+                                      166.7, 155.2, 149.1, 140.6, 131.9, 119.7, 105.8, 95.4,
+                                      83.4, 73.2, 62.4, 52.3, 42.7, 34.7, 27, 19.9, 13.2, 8.8,
+                                      5.9, 3.8, 6.8),
+                                    rep(0, 10))
 
   input_help$agent$p_prevalence_age <- "Age pyramid at baseline (taken from CanSim.052-0005.xlsm for year 2015)"
   input$agent$p_prevalence_age <- input$agent$p_prevalence_age/sum(input$agent$p_prevalence_age)
@@ -194,12 +166,21 @@ init_input <- function() {
 
 
   input_help$smoking$ln_h_inc_betas <- "Log-hazard of starting smoking (incidence or relapse)"
-  input$smoking$ln_h_inc_betas <- c(intercept = -4, sex = -0.15, age = -0.02, age2 = 0, calendar_time = -0.01)
+  input$smoking$ln_h_inc_betas <- c(intercept = -4,
+                                    sex = -0.15,
+                                    age = -0.02,
+                                    age2 = 0,
+                                    calendar_time = -0.01)
   input_ref$smoking$ln_h_inc_betas <- ""
 
 
   input_help$smoking$ln_h_ces_betas <- "Log-hazard of smoking cessation"
-  input$smoking$ln_h_ces_betas <- c(intercept = -3.7,  sex = 0, age = 0.02, age2 = 0, calendar_time = -0.01, diagnosis = 0.16)
+  input$smoking$ln_h_ces_betas <- c(intercept = -3.7,
+                                    sex = 0,
+                                    age = 0.02,
+                                    age2 = 0,
+                                    calendar_time = -0.01,
+                                    diagnosis = 0.16)
   input_ref$smoking$ln_h_ces_betas <- ""
 
 
@@ -265,12 +246,12 @@ init_input <- function() {
 
 
 
-   input_help$lung_function$dfev1_betas <- "Regression equations (mixed-effects model) for rate of FEV1 decline"
-     input$lung_function$fev1_betas_by_sex <- cbind(male = c(intercept = -0.1543 - 0.00762, baseline_age = 0.002344, baseline_weight_kg = 0.000126,
-                                                             height = 0.05835, height_sq = 0.01807, current_smoker = -0.03074, age_height_sq = -0.00093, followup_time = -0.00146),
-                                                   female = c(intercept = -0.1543 , baseline_age = 0.002344, baseline_weight_kg = 0.000126,
-                                                               height = 0.05835, height_sq = 0.01807, current_smoker = -0.03074, age_height_sq = -0.00093, followup_time = -0.00146))
-     input_ref$lung_function$dfev1_betas <- ""
+  input_help$lung_function$dfev1_betas <- "Regression equations (mixed-effects model) for rate of FEV1 decline"
+  input$lung_function$fev1_betas_by_sex <- cbind(male = c(intercept = -0.1543 - 0.00762, baseline_age = 0.002344, baseline_weight_kg = 0.000126,
+                                                          height = 0.05835, height_sq = 0.01807, current_smoker = -0.03074, age_height_sq = -0.00093, followup_time = -0.00146),
+                                                 female = c(intercept = -0.1543 , baseline_age = 0.002344, baseline_weight_kg = 0.000126,
+                                                            height = 0.05835, height_sq = 0.01807, current_smoker = -0.03074, age_height_sq = -0.00093, followup_time = -0.00146))
+  input_ref$lung_function$dfev1_betas <- ""
 
   # input$lung_function$fev1_betas_by_sex <- cbind(male = c(intercept = -0.1543 , baseline_age = 0, baseline_weight_kg = 0,
   #                                                         height = 0, height_sq = 0, current_smoker = 0, age_height_sq = 0, followup_time = 0),
@@ -391,7 +372,7 @@ init_input <- function() {
 
   ## Outpatient;
 
-    # Primary care visits;
+  # Primary care visits;
   input_help$outpatient$ln_rate_gpvisits_COPD_by_sex <- "Rate of GP visits for COPD patients"
   input$outpatient$ln_rate_gpvisits_COPD_by_sex <- cbind(male=c(intercept=0.4472, age=0.012, smoking=0.0669, fev1=-0.1414, cough=-0.0037,
                                                                 phlegm=-0.0108, wheeze=0.0553, dyspnea=0.0947),
@@ -408,7 +389,7 @@ init_input <- function() {
   input_ref$outpatient$ln_rate_gpvisits_nonCOPD_by_sex <- "Kate's regression on CanCOLD, provided on 2019-05-29"
   input$outpatient$dispersion_gpvisits_nonCOPD <- 0.4093
 
-    # Extras
+  # Extras
   input$outpatient$rate_doctor_visit <- 0.1
   input$outpatient$p_specialist <- 0.1
 
@@ -549,4 +530,3 @@ init_input <- function() {
   return (model_input)
 }
 
-model_input <- init_input()

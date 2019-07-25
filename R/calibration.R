@@ -123,11 +123,6 @@ calibrate_mi_incidence <- function(simple = F) {
 }
 
 
-
-
-
-
-
 #' Calibrates smoking
 #' @return TODO
 #' @export
@@ -171,7 +166,7 @@ calibrate_smoking <- function() {
   for (i in 0:1) for (j in 1:length(age_list)) tab2[i + 1, j] <- mean(data0[which(data0[, "sex"] == i & data0[, "age_at_creation"] >
                                                                                     age_list[[j]][1] & data0[, "age_at_creation"] <= age_list[[j]][2]), "smoking_status"])
 
-  cat("I will now show you the model generated bar plor")
+  cat("I will now show you the model generated bar plot")
   petoc()
   barplot(tab2, beside = T, names.arg = c("40", "52", "65+"))
 

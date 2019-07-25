@@ -34,6 +34,10 @@ report_COPD_by_ctime <- function(n_sim = 10^6) {
   y2 <- rowSums(a[, g2])/rowSums(b[, g2])
   y3 <- rowSums(a[, g3])/rowSums(b[, g3])
   y4 <- rowSums(a[, g4])/rowSums(b[, g4])
+  y1[is.nan(y1)] = 0
+  y2[is.nan(y2)] = 0
+  y3[is.nan(y3)] = 0
+  y4[is.nan(y4)] = 0
   max_y <- max(c(y1, y2, y3, y4))
   plot(2015:2034, y1, type = "l", ylim = c(0, max_y * 1.5), xlab = "Year", ylab = "Annual incidence", col = "green")
   lines(2015:2034, y2, type = "l", col = "blue")

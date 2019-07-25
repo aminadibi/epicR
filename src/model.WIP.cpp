@@ -316,7 +316,7 @@ List Cget_runtime_stats()
 
 
 ////////////////////////////////////////////////////////////////////RANDOM/////////////////////////////////////////////////
-//these stuff are internal so no expoert/import;
+//these stuff are internal so no export/import;
 double *runif_buffer;
 long runif_buffer_pointer;
 
@@ -3406,7 +3406,7 @@ int Callocate_resources2()
   //runif_buffer=(double *)malloc(runif_buffer_size*sizeof(double));
   runif_buffer=new double[settings.runif_buffer_size];
   if(runif_buffer==NULL) return(ERR_MEMORY_ALLOCATION_FAILED);
-  runif_buffer_pointer=settings.runif_buffer_size; //invoikes fill next time;
+  runif_buffer_pointer=settings.runif_buffer_size; //invokes fill next time;
 
   rnorm_buffer=new double[settings.rnorm_buffer_size];
   if(rnorm_buffer==NULL) return(ERR_MEMORY_ALLOCATION_FAILED);

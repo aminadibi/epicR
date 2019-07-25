@@ -189,6 +189,8 @@ get_all_events <- function() {
 #' Runs the model, after a session has been initialized.
 #' @param max_n_agents maximum number of agents
 #' @param input customized input criteria
+#' If no input is provided, will use the default input
+#' See createInput function
 #' @return 0 if successful.
 #' @export
 run <- function(max_n_agents = NULL, input = NULL) {
@@ -200,7 +202,7 @@ run <- function(max_n_agents = NULL, input = NULL) {
 
   default_input<-init_input()$values
   res<-set_Cmodel_inputs(process_input(default_input))
-
+  print(res)
   if (!is.null(input) || length(input)==0)
   {
     res<-set_Cmodel_inputs(process_input(input))
@@ -211,9 +213,11 @@ run <- function(max_n_agents = NULL, input = NULL) {
   }
 
   if (res == 0) {
-    if (is.null(max_n_agents))
+    if (is.null(max_n_agents)) {
       max_n_agents = .Machine$integer.max
+    }
     res <- Cmodel(max_n_agents)
+    print(res)
   }
   if (res < 0) {
     message("ERROR:", names(which(errors == res)))
@@ -222,9 +226,6 @@ run <- function(max_n_agents = NULL, input = NULL) {
   return(res)
 
 }
-
-
-
 
 #' Resumes running of model.
 #' @param max_n_agents maximum number of agents
