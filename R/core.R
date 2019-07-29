@@ -5,7 +5,6 @@ session_env$global_error_code_chain<-NULL
 session_env$global_error_message_chain<-NULL
 
 
-
 # Cleaning up when package unloads
 .onUnload <- function(libpath) {
   library.dynam.unload("epicR", libpath)
@@ -23,8 +22,21 @@ default_settings <- list(record_mode = record_mode["record_mode_event"],
                          agent_stack_size = 0,
                          event_stack_size = 5e4 * 1.7 * 30)
 
-#' Exports default settings
+#' @title Get Default Settings
+#' @description Exports default settings for the dynamic microsimulation
 #' @return default settings
+#'
+#' \itemize{
+#' \item record_mode:
+#' \item events_to_record:
+#' \item agent_creation_mode:
+#' \item update_continuous_outcomes_mode:
+#' \item runif_buffer_size:
+#' \item rnorm_buffer_size:
+#' \item rexp_buffer_size:
+#' \item agent_stack_size:
+#' \item event_stack_size:
+#' }
 #' @export
 get_default_settings<-function()
 {
@@ -32,10 +44,11 @@ get_default_settings<-function()
 }
 
 
-
 # Population of Canada over 40 years by StatsCan 18,415.60
 
-#' Initializes a model. Allocates memory to the C engine.
+#' @title Initialize COPD Dynamic Microsimulation
+#' @description Initializes a model. Since the backend of the model is in C++, we need to initialize
+#' memory allocation here. This function must be called before the \code{run()} function.
 #' @param settings customized settings.
 #' @return 0 if successful.
 #' @export
@@ -50,7 +63,8 @@ init_session <- function(settings = get_default_settings()) {
   return(Callocate_resources())
 }
 
-#' Terminates a session and releases allocated memory.
+#' @title Terminate Simulation
+#' @description Terminates a session and releases allocated memory. Call this after you are finished.
 #' @return 0 if successful.
 #' @export
 terminate_session <- function() {
@@ -73,7 +87,6 @@ apply_settings <- function(settings = settings) {
   }
   return(res)
 }
-
 
 
 update_run_env_setting <- function(setting_var, value) {
@@ -151,10 +164,82 @@ express_matrix <- function(mtx) {
 }  #Takes a named matrix and write the R code to populate it; good for generating input expressions from calibration results
 
 
-
-#' Returns events specific to an agent.
-#' @param id Agent number
-#' @return dataframe consisting all events specific to agent \code{id}
+#' @title Get Events Matrix for a Specific Person
+#' @description Given an id, returns the events matrix for a specific person in the microsimulation
+#' ("individual" = "person" = "agent")
+#' @param id Agent number (person's id)
+#' @return Returns a data frame consisting of all events from the model simulation specific to agent \code{id}
+#'
+#' The data frame returned has parameters as follows:
+#'
+#' \itemize{
+#' \item id: A unique character string identifying a patient
+#' \item local_time: time in years since start of the simulation
+#' \item alive: whether the patient is alive; alive = 1, dead = 0
+#' \item sex: whether the patient is male or female; male = 1, female = 0
+#' \item height: height of the patient in metres
+#' \item weight: weight of the patient in kilograms
+#' \item age_at_creation: age of the patient at the start of the simulation (years)
+#' \item smoking_status: whether or no the patient smokes; smoker = 1, non-smoker = 0
+#' \item pack_years: 1 pack year = patient smokes 1 pack (20 cigarettes)/day for a year
+#' \item fev1: forced expiratroy volume in 1 second in L (0--5)
+#' \item fev1_slope:
+#' \item fev1_slope_t:
+#' \item ln_exac_rate_intercept:
+#' \item logit_exac_severity_intercept:
+#' \item cumul_exac0:
+#' \item cumul_exac1:
+#' \item cumul_exac2:
+#' \item cumul_exac3:
+#' \item weight_baseline:
+#' \item followup_time:
+#' \item age_baseline:
+#' \item fev1_baseline: baseline FEV1 score at start of the simulation (L)
+#' \item fev1_tail:
+#' \item gold: GOLD status, (0-5)
+#' \item local_time_at_COPD:
+#' \item cumul_cost: cumulative cost in 2015 $CAD of direct maintenance costs and exacerbation costs of COPD
+#' \item cumul_qaly: cumulative Quality Adjusted Life Years (QALYs) lost; 1 QALY = 1 year in perfect health
+#' \item annual_cost: annual cost in 2015 $CAD of direct maintenance costs and exacerbation costs of COPD
+#' \item annual_qaly: annual  Quality Adjusted Life Years (QALYs) lost; 1 QALY = 1 year in perfect health
+#' \item tte:
+#' \item event: event type
+#' \itemize{
+#' \item 0 = person is created in simulation
+#' \item 1 = fixed
+#' \item 2 = person has a birthday
+#' \item 3 = person starts or quits smoking
+#' \item 4 = person is diagnosed with COPD
+#' \item 5 = person starts to have an exacerbation
+#' \item 6 = person ends exacerbation
+#' \item 7 = person dies from exacerbation
+#' \item 8 = person visits doctor
+#' \item 9 = person changes medication
+#' \item 10 = person has a myocardial infarction
+#' \item 11 = person has a stroke
+#' \item 12 = person has heart failure
+#' \item 13 = person dies from non-exacerbation causes
+#' \item 14 = end
+#' }
+#' \item symptom_score:
+#' \item last_doctor_visit_time:
+#' \item last_doctor_visit_type:
+#' \item medication_status:
+#' \item n_mi: number of myocardial infarctions
+#' \item n_stroke: number of strokes
+#' \item p_COPD:
+#' \item cough: patient symptoms during doctor visit; 1 = has cough, 0 = no cough
+#' \item phlegm: patient symptoms during doctor visit; 1 = has phlegm, 0 = no phlegm
+#' \item dyspnea: patient symptoms during doctor visit; 1 = has dyspnea, 0 = no dyspnea
+#' \item wheeze: patient symptoms during doctor visit; 1 = has wheeze, 0 = no wheeze
+#' \item re_cough:
+#' \item re_phlegm:
+#' \item re_dyspnea:
+#' \item re_wheeze:
+#' \item gpvisits: number of GP visits in a year
+#' \item diagnosis:
+#' \item case_detection:
+#' }
 #' @export
 get_agent_events <- function(id) {
   x <- Cget_agent_events(id)
@@ -163,8 +248,26 @@ get_agent_events <- function(id) {
   return(data)
 }
 
-#' Returns certain events by type
-#' @param event_type event_type number
+#' @title Get Events Matrix by Event Type
+#' @description Returns certain events by type
+#' @param event_type event type, (0-14)
+#' \itemize{
+#' \item 0 = person is created in simulation
+#' \item 1 = fixed
+#' \item 2 = person has a birthday
+#' \item 3 = person starts or quits smoking
+#' \item 4 = person is diagnosed with COPD
+#' \item 5 = person starts to have an exacerbation
+#' \item 6 = person ends exacerbation
+#' \item 7 = person dies from exacerbation
+#' \item 8 = person visits doctor
+#' \item 9 = person changes medication
+#' \item 10 = person has a myocardial infarction
+#' \item 11 = person has a stroke
+#' \item 12 = person has heart failure
+#' \item 13 = person dies from non-exacerbation causes
+#' \item 14 = end
+#' }
 #' @return dataframe consisting all events of the type \code{event_type}
 #' @export
 get_events_by_type <- function(event_type) {
@@ -174,8 +277,83 @@ get_events_by_type <- function(event_type) {
   return(data)
 }
 
-#' Returns all events.
-#' @return dataframe consisting all events.
+#' @title Get Events Matrix
+#' @description For a dynamic microsimulation, an event is defined to be a change in a simulated individual.
+#' Examples of an event are birth, death due to COPD exacerbation, death due to other causes (background mortality),
+#' change in smoking status (quitting smoking), etc.
+#' @return Returns a data frame consisting of all events from the model simulation.
+#'
+#' The data frame returned has parameters as follows:
+#'
+#' \itemize{
+#' \item id: A unique character string identifying a patient
+#' \item local_time: time in years since start of the simulation
+#' \item alive: whether the patient is alive; alive = 1, dead = 0
+#' \item sex: whether the patient is male or female; male = 1, female = 0
+#' \item height: height of the patient in metres
+#' \item weight: weight of the patient in kilograms
+#' \item age_at_creation: age of the patient at the start of the simulation (years)
+#' \item smoking_status: whether or no the patient smokes; smoker = 1, non-smoker = 0
+#' \item pack_years: 1 pack year = patient smokes 1 pack (20 cigarettes)/day for a year
+#' \item fev1: forced expiratroy volume in 1 second in L (0--5)
+#' \item fev1_slope:
+#' \item fev1_slope_t:
+#' \item ln_exac_rate_intercept:
+#' \item logit_exac_severity_intercept:
+#' \item cumul_exac0:
+#' \item cumul_exac1:
+#' \item cumul_exac2:
+#' \item cumul_exac3:
+#' \item weight_baseline:
+#' \item followup_time:
+#' \item age_baseline:
+#' \item fev1_baseline: baseline FEV1 score at start of the simulation (L)
+#' \item fev1_tail:
+#' \item gold: GOLD status, (0-5)
+#' \item local_time_at_COPD:
+#' \item cumul_cost: cumulative cost in 2015 $CAD of direct maintenance costs and exacerbation costs of COPD
+#' \item cumul_qaly: cumulative Quality Adjusted Life Years (QALYs) lost; 1 QALY = 1 year in perfect health
+#' \item annual_cost: annual cost in 2015 $CAD of direct maintenance costs and exacerbation costs of COPD
+#' \item annual_qaly: annual  Quality Adjusted Life Years (QALYs) lost; 1 QALY = 1 year in perfect health
+#' \item tte:
+#' \item event: event type
+#' \itemize{
+#' \item 0 = person is created in simulation
+#' \item 1 = fixed
+#' \item 2 = person has a birthday
+#' \item 3 = person starts or quits smoking
+#' \item 4 = person is diagnosed with COPD
+#' \item 5 = person starts to have an exacerbation
+#' \item 6 = person ends exacerbation
+#' \item 7 = person dies from exacerbation
+#' \item 8 = person visits doctor
+#' \item 9 = person changes medication
+#' \item 10 = person has a myocardial infarction
+#' \item 11 = person has a stroke
+#' \item 12 = person has heart failure
+#' \item 13 = person dies from non-exacerbation causes
+#' \item 14 = end
+#' }
+#' \item symptom_score:
+#' \item last_doctor_visit_time:
+#' \item last_doctor_visit_type:
+#' \item medication_status:
+#' \item n_mi: number of myocardial infarctions
+#' \item n_stroke: number of strokes
+#' \item p_COPD:
+#' \item cough: patient symptoms during doctor visit; 1 = has cough, 0 = no cough
+#' \item phlegm: patient symptoms during doctor visit; 1 = has phlegm, 0 = no phlegm
+#' \item dyspnea: patient symptoms during doctor visit; 1 = has dyspnea, 0 = no dyspnea
+#' \item wheeze: patient symptoms during doctor visit; 1 = has wheeze, 0 = no wheeze
+#' \item re_cough:
+#' \item re_phlegm:
+#' \item re_dyspnea:
+#' \item re_wheeze:
+#' \item gpvisits: number of GP visits in a year
+#' \item diagnosis:
+#' \item case_detection:
+#' }
+
 #' @export
 get_all_events <- function() {
   x <- Cget_all_events()
@@ -184,13 +362,12 @@ get_all_events <- function() {
   return(data)
 }
 
-
-
-#' Runs the model, after a session has been initialized.
+#' @title Run COPD Dynamic Microsimulation Model
+#' @description Runs the model, after a session has been initialized. Must call \code{init_session()} first.
 #' @param max_n_agents maximum number of agents
 #' @param input customized input criteria
 #' If no input is provided, will use the default input
-#' See createInput function
+#' See \code{createInput()} function
 #' @return 0 if successful.
 #' @export
 run <- function(max_n_agents = NULL, input = NULL) {
@@ -242,8 +419,6 @@ resume <- function(max_n_agents = NULL) {
 }
 
 
-
-
 # processes input and returns the processed one
 process_input <- function(ls, decision = 1)
 {
@@ -260,15 +435,11 @@ process_input <- function(ls, decision = 1)
   return(ls)
 }
 
-
-
-
 reset_errors<-function()
 {
   session_env$global_error_code_chain<-NULL
   session_env$global_error_message_chain<-NULL
 }
-
 
 
 set_error <- function(error_code, error_message="")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/core.R
 \name{init_session}
 \alias{init_session}
-\title{Initializes a model. Allocates memory to the C engine.}
+\title{Initialize COPD Dynamic Microsimulation}
 \usage{
 init_session(settings = get_default_settings())
 }
@@ -13,5 +13,6 @@ init_session(settings = get_default_settings())
 0 if successful.
 }
 \description{
-Initializes a model. Allocates memory to the C engine.
+Initializes a model. Since the backend of the model is in C++, we need to initialize
+memory allocation here. This function must be called before the \code{run()} function.
 }

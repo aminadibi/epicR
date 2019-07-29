@@ -2,7 +2,7 @@
 % Please edit documentation in R/core.R
 \name{terminate_session}
 \alias{terminate_session}
-\title{Terminates a session and releases allocated memory.}
+\title{Terminate Simulation}
 \usage{
 terminate_session()
 }
@@ -10,5 +10,5 @@ terminate_session()
 0 if successful.
 }
 \description{
-Terminates a session and releases allocated memory.
+Terminates a session and releases allocated memory. Call this after you are finished.
 }

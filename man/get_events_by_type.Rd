@@ -2,12 +2,29 @@
 % Please edit documentation in R/core.R
 \name{get_events_by_type}
 \alias{get_events_by_type}
-\title{Returns certain events by type}
+\title{Get Events Matrix by Event Type}
 \usage{
 get_events_by_type(event_type)
 }
 \arguments{
-\item{event_type}{event_type number}
+\item{event_type}{event type, (0-14)
+\itemize{
+\item 0 = person is created in simulation
+\item 1 = fixed
+\item 2 = person has a birthday
+\item 3 = person starts or quits smoking
+\item 4 = person is diagnosed with COPD
+\item 5 = person starts to have an exacerbation
+\item 6 = person ends exacerbation
+\item 7 = person dies from exacerbation
+\item 8 = person visits doctor
+\item 9 = person changes medication
+\item 10 = person has a myocardial infarction
+\item 11 = person has a stroke
+\item 12 = person has heart failure
+\item 13 = person dies from non-exacerbation causes
+\item 14 = end
+}}
 }
 \value{
 dataframe consisting all events of the type \code{event_type}

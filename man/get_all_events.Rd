@@ -2,13 +2,86 @@
 % Please edit documentation in R/core.R
 \name{get_all_events}
 \alias{get_all_events}
-\title{Returns all events.}
+\title{Get Events Matrix}
 \usage{
 get_all_events()
 }
 \value{
-dataframe consisting all events.
+Returns a data frame consisting of all events from the model simulation.
+
+The data frame returned has parameters as follows:
+
+\itemize{
+\item id: A unique character string identifying a patient
+\item local_time: time in years since start of the simulation
+\item alive: whether the patient is alive; alive = 1, dead = 0
+\item sex: whether the patient is male or female; male = 1, female = 0
+\item height: height of the patient in metres
+\item weight: weight of the patient in kilograms
+\item age_at_creation: age of the patient at the start of the simulation (years)
+\item smoking_status: whether or no the patient smokes; smoker = 1, non-smoker = 0
+\item pack_years: 1 pack year = patient smokes 1 pack (20 cigarettes)/day for a year
+\item fev1: forced expiratroy volume in 1 second in L (0--5)
+\item fev1_slope:
+\item fev1_slope_t:
+\item ln_exac_rate_intercept:
+\item logit_exac_severity_intercept:
+\item cumul_exac0:
+\item cumul_exac1:
+\item cumul_exac2:
+\item cumul_exac3:
+\item weight_baseline:
+\item followup_time:
+\item age_baseline:
+\item fev1_baseline: baseline FEV1 score at start of the simulation (L)
+\item fev1_tail:
+\item gold: GOLD status, (0-5)
+\item local_time_at_COPD:
+\item cumul_cost: cumulative cost in 2015 $CAD of direct maintenance costs and exacerbation costs of COPD
+\item cumul_qaly: cumulative Quality Adjusted Life Years (QALYs) lost; 1 QALY = 1 year in perfect health
+\item annual_cost: annual cost in 2015 $CAD of direct maintenance costs and exacerbation costs of COPD
+\item annual_qaly: annual  Quality Adjusted Life Years (QALYs) lost; 1 QALY = 1 year in perfect health
+\item tte:
+\item event: event type
+\itemize{
+\item 0 = person is created in simulation
+\item 1 = fixed
+\item 2 = person has a birthday
+\item 3 = person starts or quits smoking
+\item 4 = person is diagnosed with COPD
+\item 5 = person starts to have an exacerbation
+\item 6 = person ends exacerbation
+\item 7 = person dies from exacerbation
+\item 8 = person visits doctor
+\item 9 = person changes medication
+\item 10 = person has a myocardial infarction
+\item 11 = person has a stroke
+\item 12 = person has heart failure
+\item 13 = person dies from non-exacerbation causes
+\item 14 = end
+}
+\item symptom_score:
+\item last_doctor_visit_time:
+\item last_doctor_visit_type:
+\item medication_status:
+\item n_mi: number of myocardial infarctions
+\item n_stroke: number of strokes
+\item p_COPD:
+\item cough: patient symptoms during doctor visit; 1 = has cough, 0 = no cough
+\item phlegm: patient symptoms during doctor visit; 1 = has phlegm, 0 = no phlegm
+\item dyspnea: patient symptoms during doctor visit; 1 = has dyspnea, 0 = no dyspnea
+\item wheeze: patient symptoms during doctor visit; 1 = has wheeze, 0 = no wheeze
+\item re_cough:
+\item re_phlegm:
+\item re_dyspnea:
+\item re_wheeze:
+\item gpvisits: number of GP visits in a year
+\item diagnosis:
+\item case_detection:
+}
 }
 \description{
-Returns all events.
+For a dynamic microsimulation, an event is defined to be a change in a simulated individual.
+Examples of an event are birth, death due to COPD exacerbation, death due to other causes (background mortality),
+change in smoking status (quitting smoking), etc.
 }

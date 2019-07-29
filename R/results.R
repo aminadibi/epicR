@@ -62,3 +62,14 @@ getExResults = function() {
 getMainResults = function() {
   mainResults = Cget_output()
 }
+
+getDemographicResults = function() {
+  extendedResults = getExResults()
+  demographicParam = c("n_alive_by_ctime_sex",
+                       "n_alive_by_ctime_age",
+                       "n_smoking_status_by_ctime",
+                       "n_current_smoker_by_ctime_sex",
+                       "n_alive_by_age_sex",
+                       "sum_age_by_ctime_sex",
+                       "n_death_by_age_sex")
+}

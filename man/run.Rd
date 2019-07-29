@@ -2,18 +2,20 @@
 % Please edit documentation in R/core.R
 \name{run}
 \alias{run}
-\title{Runs the model, after a session has been initialized.}
+\title{Run COPD Dynamic Microsimulation Model}
 \usage{
 run(max_n_agents = NULL, input = NULL)
 }
 \arguments{
 \item{max_n_agents}{maximum number of agents}
 
-\item{input}{customized input criteria}
+\item{input}{customized input criteria
+If no input is provided, will use the default input
+See \code{createInput()} function}
 }
 \value{
 0 if successful.
 }
 \description{
-Runs the model, after a session has been initialized.
+Runs the model, after a session has been initialized. Must call \code{init_session()} first.
 }

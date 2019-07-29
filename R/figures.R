@@ -1,8 +1,11 @@
-#' Runs the model and exports an excel file with all output data
+#' @title Create Excel Figures
+#' @description Runs the model and exports an excel file with all output data
 #' @param nPatients number of agents
+#' @param directory full file path of folder where you would like the figures to be saved. The default
+#' is the current working directory.
 #' @return an excel file with all output
 #' @export
-export_figures <- function(nPatients = 1e4) {
+export_figures <- function(nPatients = 1e4, directory = NULL) {
 
   settings <- default_settings
   settings$record_mode <- record_mode["record_mode_event"]
@@ -835,7 +838,11 @@ export_figures <- function(nPatients = 1e4) {
 
   ####################################################### Save workbook #####################################################
   ## Open in excel without saving file: openXL(wb)
-  wbfilename <- paste(Sys.Date(), " Figures EpicR ver", packageVersion("epicR"), ".xlsx")
+  if(is.null(directory)) {
+    wbfilename <- paste0(Sys.Date(), " Figures EpicR ver", packageVersion("epicR"), ".xlsx")
+  } else {
+    wbfilename <- paste0(directory, "/", Sys.Date(), " Figures EpicR ver", packageVersion("epicR"), ".xlsx")
+  }
   openxlsx::saveWorkbook(wb, wbfilename, overwrite = TRUE)
 
   }
