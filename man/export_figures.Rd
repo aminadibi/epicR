@@ -2,12 +2,15 @@
 % Please edit documentation in R/figures.R
 \name{export_figures}
 \alias{export_figures}
-\title{Runs the model and exports an excel file with all output data}
+\title{Create Excel Figures}
 \usage{
-export_figures(nPatients = 10000)
+export_figures(nPatients = 10000, directory = NULL)
 }
 \arguments{
 \item{nPatients}{number of agents}
+
+\item{directory}{full file path of folder where you would like the figures to be saved. The default
+is the current working directory.}
 }
 \value{
 an excel file with all output

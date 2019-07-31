@@ -1,6 +1,21 @@
-##################################### Severe_Exacerbations_sex_year #####################################################
 
-plotSevereExacerbations = function(nPatients = 1e4){
+#----------- Exacerbations -------------------------------------------------------------
+#' @title Plot COPD Exacerbations
+#' @description Creates a plot of exacerbations
+#' @param nPatients number of patients/agents/individuals to simulate
+#' @param argX string: one of "year"
+#' @param argY string: one of "exacerbation_rate", "number_of_exacerbations"
+#' @param groupBy string: one of "sex", "age", "gold"
+#' @param exacType string: "all" or "severe"
+#' @param perCapita numeric: if null, parameter is ignored, otherwise, population size to look at
+#' @return plot
+#' @export
+plotExacerbations = function(nPatients = 1e4,
+                             argX = "year",
+                             argY = "exacerbation_rate",
+                             groupBy = "sex",
+                             exacType = c("severe", "all"),
+                             perCapita = NULL){
 
   settings <- default_settings
   settings$record_mode <- record_mode["record_mode_event"]
@@ -11,19 +26,20 @@ plotSevereExacerbations = function(nPatients = 1e4){
   input <- model_input$values
 
   run(input=input)
-  data <- as.data.frame(Cget_all_events_matrix())
+  eventsMatrix <- as.data.frame(Cget_all_events_matrix())
   op <- Cget_output()
-  op_ex <- Cget_output_ex()
+  extendedResults <- Cget_output_ex()
   terminate_session()
 
+  themeColors = c("#330033", "#8cf2f2", "#c51672", "#007bff")
 
 sev_exac_by_sex_by_year <- matrix (NA, nrow = input$global_parameters$time_horizon, ncol = 3)
 colnames(sev_exac_by_sex_by_year) <- c("Year", "male", "female")
 sev_exac_by_sex_by_year[1:input$global_parameters$time_horizon, 1] <- c(2015:(2015+input$global_parameters$time_horizon-1))
 
-sev_exac_by_sex_by_year[, 3] <- rowSums(op_ex$n_exac_by_ctime_severity_female [, 3:4]) / (op_ex$n_COPD_by_ctime_sex)[, 2]
-sev_exac_by_sex_by_year[, 2] <- rowSums(op_ex$n_exac_by_ctime_severity [, 3:4] -
-                                          op_ex$n_exac_by_ctime_severity_female [, 3:4]) / (op_ex$n_COPD_by_ctime_sex)[, 1]
+sev_exac_by_sex_by_year[, 3] <- rowSums(extendedResults$n_exac_by_ctime_severity_female [, 3:4]) / (extendedResults$n_COPD_by_ctime_sex)[, 2]
+sev_exac_by_sex_by_year[, 2] <- rowSums(extendedResults$n_exac_by_ctime_severity [, 3:4] -
+                                          extendedResults$n_exac_by_ctime_severity_female [, 3:4]) / (extendedResults$n_COPD_by_ctime_sex)[, 1]
 
 sev_exac_by_sex_by_year <- as.data.frame(sev_exac_by_sex_by_year)
 dfm <- reshape2::melt(sev_exac_by_sex_by_year[,c("Year", "male", "female")],id.vars = 1)
@@ -40,3 +56,196 @@ p <- ggplot(dfm, aes(x = Year, y = value, color = Gender)) +
 
 p
 }
+
+#--------------------- COPD Incidence/Occurrence -------------------------------------------
+
+#' @title Plot COPD Occurrence/Incidence
+#' @description Creates a plot of exacerbations
+#' @param nPatients number of patients/agents/individuals to simulate
+#' @param argX string: one of "year", "age"
+#' @param argY string: one of "incidence", "prevalence"
+#' @param groupBy string: one of "sex", "age", "gold"
+#' @param aggregateBy string: one of "age", "none"
+#' @param perCapita numeric: if null, parameter is ignored, otherwise, population size to look at
+#' @return plot
+#' @export
+plotCOPD = function(nPatients = 1e4,
+                    argX = "age",
+                    argY = "incidence",
+                    aggregateBy = "none",
+                    groupBy = NULL,
+                    perCapita = NULL){
+
+  settings <- default_settings
+  settings$record_mode <- record_mode["record_mode_event"]
+  settings$agent_stack_size <- 0
+  settings$n_base_agents <- nPatients
+  settings$event_stack_size <- nPatients * 1.7 * 30 * 2
+  init_session(settings = settings)
+  input <- model_input$values
+
+  run(input=input)
+  eventsMatrix <- as.data.frame(Cget_all_events_matrix())
+  op <- Cget_output()
+  extendedResults <- Cget_output_ex()
+  terminate_session()
+  themeColors = c("#330033", "#8cf2f2", "#c51672", "#007bff")
+
+  if(argX == "age") {
+    if(aggregateBy == "age") {
+      xOptions = c("40-50", "50-60", "60-70", "70-80", "80-90")
+    } else {
+      xOptions = c(40:90)
+    }
+    xLabel = "Age"
+  } else if(argX == "year") {
+    xOptions = c(2015:(2015+input$global_parameters$time_horizon-1))
+    xLabel = "Year"
+  }
+  if(groupBy == "sex") {
+    groupByNames = c("Male", "Female")
+    legendTitle = "Gender"
+    colorPalette = c("#CC6666", "#56B4E9")
+  } else {
+    groupByNames = c("Incidence")
+    legendTitle = ""
+    colorPalette = themeColors[4]
+  }
+  columnNames = c(xLabel, groupByNames)
+  numRows = length(xOptions)
+  if(argY == "incidence") {
+    yMatrix = getIncidence(extendedResults, eventsMatrix, aggregateBy, argX, numRows)
+    yTitle = "COPD Incidence (%)"
+    plotTitle = paste0("COPD Incidence by ", xLabel)
+  } else if(argY == "prevalence"){
+    yMatrix = getPrevalence(extendedResults, eventsMatrix, aggregateBy, argX, numRows)
+    yTitle = "COPD Prevalence (%)"
+    plotTitle = paste0("COPD Prevalence by ", xLabel)
+  }
+  yMatrix = as.data.frame(yMatrix) * 100 #converting values to percentage.
+  alive = getAlive(extendedResults, groupBy, aggregateBy = aggregateBy)
+
+  standardError <- sqrt (yMatrix * (100 - yMatrix) / alive)
+
+  df <- as.data.frame(cbind(xOptions, yMatrix))
+  colnames(df) <- columnNames
+  dfm <- reshape2::melt(df[,columnNames], id.vars = 1)
+
+  errorbar_min <- yMatrix - 1.96*standardError
+  errorbar_max <- yMatrix + 1.96*standardError
+
+  colnames(errorbar_max) = groupByNames
+  errorbar_max = reshape2::melt(errorbar_max[,groupByNames])
+  errorbar_max = errorbar_max$value
+  colnames(errorbar_min) = groupByNames
+  errorbar_min = reshape2::melt(errorbar_min[,groupByNames])
+  errorbar_min = errorbar_min$value
+
+  plotCaption = "(based on population at age 40 and above)"
+  if(length(columnNames)==2) {
+    legendPosition = "none"
+  } else {
+    legendPosition = "right"
+  }
+
+  p <- ggplot(dfm, aes_string(x = xLabel, y = "value", fill="variable")) +
+    theme_tufte(base_size=14, ticks=F) +
+    geom_bar(stat = "identity", position = "dodge") +
+    geom_errorbar(aes(ymin = errorbar_min, ymax = errorbar_max), width=.2, position = position_dodge(.9)) +
+    labs(title = plotTitle) +
+    ylab (yTitle) +
+    labs(caption = plotCaption)+
+    scale_fill_manual(legendTitle, values = colorPalette)+
+    theme(legend.position=legendPosition)
+
+  p
+}
+
+getIncidence = function(extendedResults, eventsMatrix, aggregateBy, argX, numRows) {
+
+  if(argX == "age") {
+  incidence = matrix (NA, nrow = 51, ncol = 1) #limiting it to people under 90 years old to avoid noise error
+
+  incidence[,1] = colSums(extendedResults$n_inc_COPD_by_ctime_age[,40:90])
+
+
+  if(aggregateBy == "age") {
+    groupedIncidence = matrix (0, nrow = 5, ncol = 1) #40-50, 50-60, 60-70, 70-80,  80-90, 90+
+    groupedAlive = getAlive(extendedResults, "age", aggregateBy)
+    for(i in 0:4) {
+      indices = c((10*i+1):(10*i + 10))
+      groupedIncidence[i+1,] = sum(incidence[indices,]) / groupedAlive[i+1,]
+    }
+    return(groupedIncidence)
+  } else {
+    alive = getAlive(extendedResults, "age", "none")
+    incidence = incidence / alive
+    return(incidence)
+  }
+  } else if(argX == "year") {
+    incEvent = subset(eventsMatrix, event == 4)
+    incidence = matrix(NA, nrow = numRows, ncol = 2)
+    for (i in 1:numRows){
+      incidence[i, 1] = dim(subset(incEvent, ((female == 0) & (ceiling(local_time + time_at_creation) == i)) ))[1]
+      incidence[i, 2] = dim(subset(incEvent, ((female == 1) & (ceiling(local_time + time_at_creation) == i)) ))[1]
+    }
+    alive = getAlive(extendedResults, "sex", "none")
+    incidence = incidence / alive
+    return(incidence)
+  }
+}
+
+getPrevalence = function(extendedResults, eventsMatrix, aggregateBy, argX, numRows) {
+
+  if(argX == "age") {
+    prevalence = matrix (NA, nrow = 51, ncol = 1) #limiting it to people under 90 years old to avoid noise error
+
+    prevalence[,1] = colSums(extendedResults$n_COPD_by_ctime_age[,40:90])
+
+
+    if(aggregateBy == "age") {
+      groupedPrevalence = matrix (0, nrow = 5, ncol = 1) #40-50, 50-60, 60-70, 70-80,  80-90, 90+
+      groupedAlive = getAlive(extendedResults, "age", aggregateBy)
+      for(i in 0:4) {
+        indices = c((10*i+1):(10*i + 10))
+        groupedPrevalence[i+1,] = sum(prevalence[indices,]) / groupedAlive[i+1,]
+      }
+      return(groupedPrevalence)
+    } else {
+      alive = getAlive(extendedResults, "age", "none")
+      prevalence = prevalence / alive
+      return(prevalence)
+    }
+  } else if(argX == "year") {
+    prevalence = matrix (NA, nrow = numRows, ncol = 2) #limiting it to people under 90 years old to avoid noise error
+
+    prevalence[,1:2] = extendedResults$n_COPD_by_ctime_sex
+    alive = getAlive(extendedResults, "sex", "none")
+    prevalence = prevalence / alive
+    return(prevalence)
+  }
+}
+
+getAlive = function(extendedResults, groupBy, aggregateBy) {
+  idString = paste0("n_alive_by_ctime_", groupBy)
+  if(groupBy == "age" || groupBy == "none"){
+    idString = paste0("n_alive_by_ctime_", "age")
+  alive = as.data.frame(colSums(as.data.frame (extendedResults[[idString]]))[40:90])
+  if(aggregateBy == "age") {
+    groupedAlive = matrix (0, nrow = 5, ncol = 1) #40-50, 50-60, 60-70, 70-80,  80-90, 90+
+    for(i in 0:4) {
+      indices = c((10*i+1):(10*i + 10))
+      groupedAlive[i+1,] = sum(alive[indices,])
+    }
+    return(groupedAlive)
+  } else {
+    return(alive)
+  }
+  } else if(groupBy == "sex") {
+    alive = as.data.frame(extendedResults[[idString]])
+    return(alive)
+  }
+}
+
+
+
