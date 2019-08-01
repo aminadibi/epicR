@@ -11,17 +11,17 @@ Returns a list of results
 
 The list returned has parameters as follows:
 
-\itemize{
-\item n_agents: number of people who started in the simulation
-\item cumul_time:
-\item n_deaths: total number of deaths during the simulation
-\item n_COPD: total number of people with COPD by the end of the simulation
-\item total_exac: total number of exacerbations; columns = exacerbation severity
-\item total_exac_time: total amount of time for exacerbations; columns = exacerbation severity
-\item total_pack_years: total number of pack years the population smoked during the simulation
-\item total_doctor_visit:
-\item total_cost: total cost to the health care system, in adjusted 2015 $CAD
-\item total_qaly: total quality-adjusted life years lost (QALY) during the simulation
+\describe{
+\item{n_agents}{number of people who started in the simulation}
+\item{cumul_time}{}
+\item{n_deaths}{total number of deaths during the simulation}
+\item{n_COPD}{total number of people with COPD by the end of the simulation}
+\item{total_exac}{total number of exacerbations; columns = exacerbation severity}
+\item{total_exac_time}{total amount of time for exacerbations; columns = exacerbation severity}
+\item{total_pack_years}{total number of pack years the population smoked during the simulation}
+\item{total_doctor_visit}{}
+\item{total_cost}{total cost to the health care system, in adjusted 2015 $CAD}
+\item{total_qaly}{total quality-adjusted life years lost (QALY) during the simulation}
 }
 }
 \description{

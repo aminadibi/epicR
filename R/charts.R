@@ -1,4 +1,4 @@
-' @title Plot Exacerbations
+#' @title Plot Exacerbations
 #' @description Creates plots of exacerbations
 #' @param nPatients number of patients/agents/individuals to simulate
 #' @param argX string: one of "year"
