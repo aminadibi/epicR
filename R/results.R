@@ -1,4 +1,14 @@
 
+#' @title Plot Exacerbations
+#' @description Creates plots of exacerbations
+#' @param nPatients number of patients/agents/individuals to simulate
+#' @param arg1 string: one of "sex", "year", "gold"
+#' @param arg2 string: one of "sex", "year", "gold"
+#' @param exacType string: "all" or "severe"
+#' @param perCapita numeric: if null, parameter is ignored, otherwise, population size to look at
+#' @return Returns a plot
+
+#' @export
 getExResults = function() {
 
   extendedResults = Cget_output_ex()
