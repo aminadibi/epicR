@@ -504,7 +504,8 @@ export_figures <- function(nPatients = 1e4, directory = NULL) {
 
   plot_exac_by_age_year <- ggplot2::ggplot(dfm, aes(x = Year, y = value, color = variable)) +  theme_tufte(base_size=14, ticks=F) +
     geom_point () + geom_line() + labs(title = "Number of Exacerbations per age group") + ylab ("Number of Exacerbations")  +
-     scale_y_continuous(breaks = scales::pretty_breaks(n = 12)) + labs(caption = "(All severity levels, assuming 40+ population of Canada as 18.6 million as of the start of the simulation)")
+     scale_y_continuous(breaks = scales::pretty_breaks(n = 12)) +
+    labs(caption = "(All severity levels, assuming 40+ population of Canada as 18.6 million as of the start of the simulation)")
 
   plot(plot_exac_by_age_year) #plot needs to be showing
   openxlsx::insertPlot(wb, "Exac_by_age_year",  xy = c("I", 3), width = 20, height = 13.2 , fileType = "png", units = "cm")

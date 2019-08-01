@@ -22,8 +22,8 @@ plotExacerbations(nPatients = 10000, argX = "year",
 \item{perCapita}{numeric: if null, parameter is ignored, otherwise, population size to look at}
 }
 \value{
-plot
+Returns a plot
 }
 \description{
-Creates a plot of exacerbations
+Creates plots of exacerbations
 }
