@@ -2,11 +2,11 @@
 % Please edit documentation in R/charts.R
 \name{plotExacerbations}
 \alias{plotExacerbations}
-\title{Plot Exacerbations}
+\title{Plot COPD Exacerbations}
 \usage{
 plotExacerbations(nPatients = 10000, argX = "year",
-  argY = "exacerbation_rate", groupBy = "sex", exacType = c("all",
-  "severe"), perCapita = NULL)
+  argY = "exacerbation_rate", groupBy = "sex", exacType = c("severe",
+  "all"), perCapita = NULL)
 }
 \arguments{
 \item{nPatients}{number of patients/agents/individuals to simulate}
