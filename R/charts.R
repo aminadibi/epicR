@@ -1,7 +1,5 @@
-
-#----------- Exacerbations -------------------------------------------------------------
-#' @title Plot COPD Exacerbations
-#' @description Creates a plot of exacerbations
+' @title Plot Exacerbations
+#' @description Creates plots of exacerbations
 #' @param nPatients number of patients/agents/individuals to simulate
 #' @param argX string: one of "year"
 #' @param argY string: one of "exacerbation_rate", "number_of_exacerbations"
@@ -15,8 +13,7 @@ plotExacerbations = function(nPatients = 1e4,
                              argX = "year",
                              argY = "exacerbation_rate",
                              groupBy = "sex",
-                             exacType = c("severe", "all"),
-                             perCapita = NULL){
+                             exacType = c("all", "severe"), perCapita = NULL){
 
   settings <- default_settings
   settings$record_mode <- record_mode["record_mode_event"]
@@ -126,6 +123,21 @@ exacerbationRateGold = function(extendedResults, numRows, numColumns) {
   rates[2:20, 1:4] = extendedResults$n_exac_by_ctime_GOLD[2:20, 1:4] /
     (extendedResults$cumul_time_by_ctime_GOLD)[2:20,2:5]
   return(rates)
+}
+
+
+groupAgeColumns = function(data, nPatients) {
+  numRows = nrow(data)
+  dataGrouped <- matrix (NA, nrow = numRows, ncol = 5)
+  for (i in (1:3)){
+    dataGrouped[,i] <- rowSums(data[, (25+(15*i)):(35+15*(i+1-1))])
+  }
+
+  dataGrouped[,4] <- rowSums(data[, 85:111]) # special case of 80+
+  dataGrouped[,5] <- rowSums(dataGrouped[, 1:4]) # all
+
+  dataGrouped[, 1:5] = dataGrouped[,1:5] / nPatients * 18e6 #18e6 is roughly the 40+ population of Canada as of 2015
+  return(dataGrouped)
 }
 
 #--------------------- COPD Incidence/Occurrence -------------------------------------------

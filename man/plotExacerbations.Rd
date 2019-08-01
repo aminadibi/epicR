@@ -25,5 +25,5 @@ plotExacerbations(nPatients = 10000, argX = "year",
 Returns a plot
 }
 \description{
-Creates plots of exacerbations
+Creates a plot of exacerbations
 }
