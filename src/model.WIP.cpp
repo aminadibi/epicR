@@ -1629,7 +1629,7 @@ void update_output_ex(agent *ag)
       output_ex.n_COPD_by_ctime_sex[time][(*ag).sex]+=((*ag).gold>0)*1;
       output_ex.n_COPD_by_ctime_age[time][age-1]+=((*ag).gold>0)*1;
       output_ex.n_COPD_by_ctime_severity[time][((*ag).gold)]+=1;
-      output_ex.n_COPD_by_age_sex[age-1][(*ag).sex]+=1;
+      output_ex.n_COPD_by_age_sex[age-1][(*ag).sex]+=((*ag).gold>0)*1;
       output_ex.n_Diagnosed_by_ctime_sex[time][(*ag).sex]+=((*ag).diagnosis>0)*1;
       if((*ag).gold>0) output_ex.n_Diagnosed_by_ctime_severity[time][(*ag).gold]+=((*ag).diagnosis>0)*1;
       if((*ag).local_time>0) output_ex.cumul_time_by_ctime_GOLD [time][((*ag).gold)]+=1;
