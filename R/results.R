@@ -24,8 +24,8 @@
 #' \item{n_COPD_by_ctime_sex}{total number of people diagnosed with COPD (prevalence); rows = years, columns = sex}
 #' \item{n_COPD_by_ctime_age}{total number of people diagnosed with COPD (prevalence); rows = years, columns = age}
 #' \item{n_inc_COPD_by_ctime_age}{}
-#' \item{n_COPD_by_ctime_severity}{}
-#' \item{n_COPD_by_age_sex}{}
+#' \item{n_COPD_by_ctime_severity}{number of people diagnosed with COPD (prevalence); rows = years, columns = GOLD status}
+#' \item{n_COPD_by_age_sex}{total number of people diagnosed with COPD (prevalence); rows = age, columns = sex}
 #' \item{n_Diagnosed_by_ctime_sex}{}
 #' \item{n_Diagnosed_by_ctime_severity}{}
 #' \item{cumul_time_by_ctime_GOLD}{}
